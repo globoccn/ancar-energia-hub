@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <main className="flex-1 px-4 py-5 md:px-6">{children}</main>
         </SidebarInset>
       </div>
+      <Toaster />
     </SidebarProvider>
   );
 }
