@@ -12,9 +12,13 @@ export const Route = createFileRoute("/alertas")({
 });
 
 const sevIcon = (s: AlertSeverity) =>
-  s === "critico" ? <AlertOctagon className="h-4 w-4 text-[var(--accent-red)]" /> :
-  s === "atencao" ? <AlertTriangle className="h-4 w-4 text-[var(--accent-yellow)]" /> :
-  <Info className="h-4 w-4 text-[var(--accent-cyan)]" />;
+  s === "critico" ? (
+    <AlertOctagon className="h-4 w-4 text-[var(--accent-red)]" />
+  ) : s === "atencao" ? (
+    <AlertTriangle className="h-4 w-4 text-[var(--accent-yellow)]" />
+  ) : (
+    <Info className="h-4 w-4 text-[var(--accent-cyan)]" />
+  );
 
 function AlertasPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -22,15 +26,29 @@ function AlertasPage() {
   const [status, setStatus] = useState<"todos" | AlertStatus>("todos");
   const [q, setQ] = useState("");
 
-  useEffect(() => { dashboardService.getAlerts().then(setAlerts); }, []);
+  useEffect(() => {
+    dashboardService.getAlerts().then(setAlerts);
+  }, []);
 
-  const filtered = useMemo(() => alerts.filter((a) => {
-    if (severity !== "todos" && a.severity !== severity) return false;
-    if (status !== "todos" && a.status !== status) return false;
-    const ql = q.toLowerCase();
-    if (ql && !(a.title.toLowerCase().includes(ql) || a.shoppingName.toLowerCase().includes(ql) || a.equipment.toLowerCase().includes(ql))) return false;
-    return true;
-  }), [alerts, severity, status, q]);
+  const filtered = useMemo(
+    () =>
+      alerts.filter((a) => {
+        if (severity !== "todos" && a.severity !== severity) return false;
+        if (status !== "todos" && a.status !== status) return false;
+        const ql = q.toLowerCase();
+        if (
+          ql &&
+          !(
+            a.title.toLowerCase().includes(ql) ||
+            a.shoppingName.toLowerCase().includes(ql) ||
+            a.equipment.toLowerCase().includes(ql)
+          )
+        )
+          return false;
+        return true;
+      }),
+    [alerts, severity, status, q],
+  );
 
   const counts = {
     total: alerts.length,
@@ -51,16 +69,32 @@ function AlertasPage() {
       </div>
 
       <div className="panel flex flex-wrap items-center gap-2 p-3">
-        <input placeholder="Buscar por título, shopping ou equipamento" value={q} onChange={(e) => setQ(e.target.value)}
-          className="h-9 min-w-64 flex-1 rounded-md border border-border/60 bg-background/60 px-3 text-sm" />
-        <select value={severity} onChange={(e) => setSeverity(e.target.value as "todos" | AlertSeverity)} className="h-9 rounded-md border border-border/60 bg-background/60 px-2 text-sm">
+        <input
+          placeholder="Buscar por título, shopping ou equipamento"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="h-9 min-w-64 flex-1 rounded-md border border-border/60 bg-background/60 px-3 text-sm"
+        />
+        <select
+          value={severity}
+          onChange={(e) => setSeverity(e.target.value as "todos" | AlertSeverity)}
+          className="h-9 rounded-md border border-border/60 bg-background/60 px-2 text-sm"
+        >
           <option value="todos">Todas as severidades</option>
-          <option value="informativo">Informativo</option><option value="atencao">Atenção</option><option value="critico">Crítico</option>
+          <option value="informativo">Informativo</option>
+          <option value="atencao">Atenção</option>
+          <option value="critico">Crítico</option>
         </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value as "todos" | AlertStatus)} className="h-9 rounded-md border border-border/60 bg-background/60 px-2 text-sm">
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as "todos" | AlertStatus)}
+          className="h-9 rounded-md border border-border/60 bg-background/60 px-2 text-sm"
+        >
           <option value="todos">Todos os status</option>
-          <option value="novo">Novo</option><option value="em_analise">Em análise</option>
-          <option value="reconhecido">Reconhecido</option><option value="resolvido">Resolvido</option>
+          <option value="novo">Novo</option>
+          <option value="em_analise">Em análise</option>
+          <option value="reconhecido">Reconhecido</option>
+          <option value="resolvido">Resolvido</option>
         </select>
       </div>
 
@@ -75,11 +109,17 @@ function AlertasPage() {
             </div>
             <div className="col-span-3 hidden text-xs md:block">
               <div className="font-medium">{a.shoppingName}</div>
-              <div className="text-muted-foreground">{a.shoppingCode} · {a.equipment}</div>
+              <div className="text-muted-foreground">
+                {a.shoppingCode} · {a.equipment}
+              </div>
             </div>
             <div className="col-span-3 flex flex-col items-end gap-1 text-xs md:col-span-2">
-              <span className="rounded bg-muted/50 px-1.5 py-0.5 text-[10px]">{severityLabel(a.severity)}</span>
-              <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px]">{alertStatusLabel(a.status)}</span>
+              <span className="rounded bg-muted/50 px-1.5 py-0.5 text-[10px]">
+                {severityLabel(a.severity)}
+              </span>
+              <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px]">
+                {alertStatusLabel(a.status)}
+              </span>
               <span className="text-muted-foreground">{formatDateTime(a.date)}</span>
             </div>
           </div>
@@ -94,7 +134,9 @@ function Stat({ label, value, color }: { label: string; value: number; color: st
     <div className="panel p-4">
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-2 flex items-center gap-2">
-        <span className="metric-value text-2xl" style={{ color }}>{value}</span>
+        <span className="metric-value text-2xl" style={{ color }}>
+          {value}
+        </span>
       </div>
     </div>
   );

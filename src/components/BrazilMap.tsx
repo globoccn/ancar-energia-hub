@@ -42,7 +42,12 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
             <stop offset="100%" stopColor="oklch(0.18 0.03 260)" stopOpacity="0.4" />
           </radialGradient>
         </defs>
-        <path d={BRAZIL_PATH} fill="url(#brazil-glow)" stroke="oklch(0.55 0.06 220 / 40%)" strokeWidth={1.2} />
+        <path
+          d={BRAZIL_PATH}
+          fill="url(#brazil-glow)"
+          stroke="oklch(0.55 0.06 220 / 40%)"
+          strokeWidth={1.2}
+        />
 
         {items.map((s) => {
           const { x, y } = project(s.latitude, s.longitude, w, h);
@@ -63,8 +68,13 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
           .sort(([, a], [, b]) => b.length - a.length)
           .map(([uf, list]) => (
             <div key={uf} className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-2 rounded-full" style={{ background: STATE_COLOR[uf] || "var(--accent-cyan)" }} />
-              <span>{uf} ({list.length})</span>
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ background: STATE_COLOR[uf] || "var(--accent-cyan)" }}
+              />
+              <span>
+                {uf} ({list.length})
+              </span>
             </div>
           ))}
       </div>

@@ -1,32 +1,74 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Bolt, Building2, Gauge, Leaf, Thermometer, Wind } from "lucide-react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Line, ComposedChart } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Legend,
+  Line,
+  ComposedChart,
+} from "recharts";
 import { dashboardService } from "@/services/dashboardService";
 import type { ShoppingDetail } from "@/types";
 import { PageHeader, LoadingBlock } from "@/components/ui-helpers";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DataUnavailable } from "@/components/DataUnavailable";
-import { formatBRL, formatNumber, formatRelative, severityLabel, alertStatusLabel } from "@/utils/format";
+import {
+  formatBRL,
+  formatNumber,
+  formatRelative,
+  severityLabel,
+  alertStatusLabel,
+} from "@/utils/format";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const Route = createFileRoute("/shoppings/$shoppingId")({
-  head: ({ params }) => ({ meta: [{ title: `${params.shoppingId.toUpperCase()} — Detalhe do Shopping` }] }),
+  head: ({ params }) => ({
+    meta: [{ title: `${params.shoppingId.toUpperCase()} — Detalhe do Shopping` }],
+  }),
   component: ShoppingDetailPage,
 });
 
 function ShoppingDetailPage() {
   const { shoppingId } = Route.useParams();
   const [d, setD] = useState<ShoppingDetail | null | undefined>(undefined);
-  useEffect(() => { setD(undefined); dashboardService.getShoppingById(shoppingId).then(setD); }, [shoppingId]);
+  useEffect(() => {
+    setD(undefined);
+    dashboardService.getShoppingById(shoppingId).then(setD);
+  }, [shoppingId]);
 
   if (d === undefined) return <LoadingBlock h={500} />;
-  if (d === null) return <div className="panel p-10 text-center">Shopping não encontrado. <Link to="/shoppings" className="text-[var(--accent-cyan)] hover:underline">Voltar</Link></div>;
+  if (d === null)
+    return (
+      <div className="panel p-10 text-center">
+        Shopping não encontrado.{" "}
+        <Link to="/shoppings" className="text-[var(--accent-cyan)] hover:underline">
+          Voltar
+        </Link>
+      </div>
+    );
 
   return (
     <div className="space-y-4">
-      <Link to="/shoppings" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        to="/shoppings"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-3.5 w-3.5" /> Voltar aos shoppings
       </Link>
 
@@ -38,9 +80,13 @@ function ShoppingDetailPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-semibold md:text-2xl">{d.name}</h1>
-              <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-semibold">{d.code}</span>
+              <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-semibold">
+                {d.code}
+              </span>
             </div>
-            <div className="text-xs text-muted-foreground">{d.city} / {d.state} · Atualizado {formatRelative(d.lastUpdate)}</div>
+            <div className="text-xs text-muted-foreground">
+              {d.city} / {d.state} · Atualizado {formatRelative(d.lastUpdate)}
+            </div>
           </div>
         </div>
         <StatusBadge status={d.status} />
@@ -48,14 +94,38 @@ function ShoppingDetailPage() {
 
       {/* Métricas principais */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
-        <MetricTile label="Potência" value={`${formatNumber(d.powerKW / 1000, { maximumFractionDigits: 2 })}`} unit="MW" />
-        <MetricTile label="Consumo dia" value={formatNumber(d.consumptionMWh, { maximumFractionDigits: 1 })} unit="MWh" />
-        <MetricTile label="Consumo mês" value={d.monthlyConsumptionMWh ? formatNumber(d.monthlyConsumptionMWh) : null} unit="MWh" />
-        <MetricTile label="Carga térmica" value={d.thermalLoadTR ? formatNumber(d.thermalLoadTR) : null} unit="TR" />
-        <MetricTile label="Eficiência" value={formatNumber(d.efficiencyKWTR, { maximumFractionDigits: 2 })} unit="kW/TR" />
+        <MetricTile
+          label="Potência"
+          value={`${formatNumber(d.powerKW / 1000, { maximumFractionDigits: 2 })}`}
+          unit="MW"
+        />
+        <MetricTile
+          label="Consumo dia"
+          value={formatNumber(d.consumptionMWh, { maximumFractionDigits: 1 })}
+          unit="MWh"
+        />
+        <MetricTile
+          label="Consumo mês"
+          value={d.monthlyConsumptionMWh ? formatNumber(d.monthlyConsumptionMWh) : null}
+          unit="MWh"
+        />
+        <MetricTile
+          label="Carga térmica"
+          value={d.thermalLoadTR ? formatNumber(d.thermalLoadTR) : null}
+          unit="TR"
+        />
+        <MetricTile
+          label="Eficiência"
+          value={formatNumber(d.efficiencyKWTR, { maximumFractionDigits: 2 })}
+          unit="kW/TR"
+        />
         <MetricTile label="COP" value={d.copValue?.toFixed(2) ?? null} />
         <MetricTile label="Delta T" value={d.deltaT?.toFixed(1) ?? null} unit="°C" />
-        <MetricTile label="Vazão" value={d.dataAvailability.vazao && d.vazaoLs ? formatNumber(d.vazaoLs) : null} unit="L/s" />
+        <MetricTile
+          label="Vazão"
+          value={d.dataAvailability.vazao && d.vazaoLs ? formatNumber(d.vazaoLs) : null}
+          unit="L/s"
+        />
         <MetricTile label="Emissões" value={d.emissionsTons?.toFixed(2) ?? null} unit="t CO₂" />
         <MetricTile label="Economia" value={d.savingsBRL ? formatBRL(d.savingsBRL) : null} />
         <MetricTile label="ESG Score" value={String(d.esgScore)} />
@@ -73,24 +143,52 @@ function ShoppingDetailPage() {
             <TabsTrigger value="7d">7 dias</TabsTrigger>
             <TabsTrigger value="30d">30 dias</TabsTrigger>
           </TabsList>
-          <TabsContent value="24h"><EnergyChart data={d.dailyConsumption} /></TabsContent>
-          <TabsContent value="7d"><EnergyChart data={d.weeklyConsumption} /></TabsContent>
-          <TabsContent value="30d"><EnergyChart data={d.monthlyConsumption} /></TabsContent>
+          <TabsContent value="24h">
+            <EnergyChart data={d.dailyConsumption} />
+          </TabsContent>
+          <TabsContent value="7d">
+            <EnergyChart data={d.weeklyConsumption} />
+          </TabsContent>
+          <TabsContent value="30d">
+            <EnergyChart data={d.monthlyConsumption} />
+          </TabsContent>
         </Tabs>
       </div>
 
       {/* Chillers, periféricos, temperaturas */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <PowerBars title="Potência de Chillers" data={d.chillerPower} color="var(--accent-cyan)" icon={<Bolt className="h-4 w-4 text-[var(--accent-cyan)]" />} />
-        <PowerBars title="Potência de Periféricos" data={d.peripheralPower} color="var(--accent-purple)" icon={<Wind className="h-4 w-4 text-[var(--accent-purple)]" />}
-          unavailable={!d.dataAvailability.perifericos} />
+        <PowerBars
+          title="Potência de Chillers"
+          data={d.chillerPower}
+          color="var(--accent-cyan)"
+          icon={<Bolt className="h-4 w-4 text-[var(--accent-cyan)]" />}
+        />
+        <PowerBars
+          title="Potência de Periféricos"
+          data={d.peripheralPower}
+          color="var(--accent-purple)"
+          icon={<Wind className="h-4 w-4 text-[var(--accent-purple)]" />}
+          unavailable={!d.dataAvailability.perifericos}
+        />
         <div className="panel p-4">
-          <div className="mb-3 flex items-center gap-2"><Thermometer className="h-4 w-4 text-[var(--accent-yellow)]" /> <h3 className="text-sm font-semibold">Temperaturas</h3></div>
+          <div className="mb-3 flex items-center gap-2">
+            <Thermometer className="h-4 w-4 text-[var(--accent-yellow)]" />{" "}
+            <h3 className="text-sm font-semibold">Temperaturas</h3>
+          </div>
           <div className="space-y-2">
             {d.temperatures.map((t) => (
-              <div key={t.name} className="flex items-center justify-between rounded-md bg-muted/20 px-3 py-2 text-sm">
+              <div
+                key={t.name}
+                className="flex items-center justify-between rounded-md bg-muted/20 px-3 py-2 text-sm"
+              >
                 <span className="text-muted-foreground">{t.name}</span>
-                {t.value !== null ? <span className="metric-value">{t.value.toFixed(1)} {t.unit}</span> : <DataUnavailable />}
+                {t.value !== null ? (
+                  <span className="metric-value">
+                    {t.value.toFixed(1)} {t.unit}
+                  </span>
+                ) : (
+                  <DataUnavailable />
+                )}
               </div>
             ))}
           </div>
@@ -118,8 +216,12 @@ function ShoppingDetailPage() {
                     <TableCell>{e.name}</TableCell>
                     <TableCell className="text-muted-foreground capitalize">{e.type}</TableCell>
                     <TableCell className="text-right metric-value">{e.powerKW} kW</TableCell>
-                    <TableCell className="text-right metric-value">{e.efficiencyKWTR ? e.efficiencyKWTR.toFixed(2) : "—"}</TableCell>
-                    <TableCell><span className="text-xs capitalize text-muted-foreground">{e.status}</span></TableCell>
+                    <TableCell className="text-right metric-value">
+                      {e.efficiencyKWTR ? e.efficiencyKWTR.toFixed(2) : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs capitalize text-muted-foreground">{e.status}</span>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -131,12 +233,21 @@ function ShoppingDetailPage() {
             <h3 className="mb-3 text-sm font-semibold">Alertas recentes</h3>
             <div className="space-y-2">
               {d.alerts.slice(0, 5).map((a) => (
-                <div key={a.id} className="rounded-md border border-border/40 bg-muted/20 p-2.5 text-xs">
+                <div
+                  key={a.id}
+                  className="rounded-md border border-border/40 bg-muted/20 p-2.5 text-xs"
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{a.title}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] ${a.severity === "critico" ? "bg-[var(--accent-red)]/15 text-[var(--accent-red)]" : a.severity === "atencao" ? "bg-[var(--accent-yellow)]/15 text-[var(--accent-yellow)]" : "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"}`}>{severityLabel(a.severity)}</span>
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] ${a.severity === "critico" ? "bg-[var(--accent-red)]/15 text-[var(--accent-red)]" : a.severity === "atencao" ? "bg-[var(--accent-yellow)]/15 text-[var(--accent-yellow)]" : "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"}`}
+                    >
+                      {severityLabel(a.severity)}
+                    </span>
                   </div>
-                  <div className="mt-1 text-muted-foreground">{a.equipment} · {alertStatusLabel(a.status)}</div>
+                  <div className="mt-1 text-muted-foreground">
+                    {a.equipment} · {alertStatusLabel(a.status)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -145,7 +256,10 @@ function ShoppingDetailPage() {
             <h3 className="mb-3 text-sm font-semibold">Oportunidades</h3>
             <div className="space-y-2">
               {d.insights.slice(0, 3).map((i) => (
-                <div key={i.id} className="rounded-md border border-border/40 bg-muted/20 p-2.5 text-xs">
+                <div
+                  key={i.id}
+                  className="rounded-md border border-border/40 bg-muted/20 p-2.5 text-xs"
+                >
                   <div className="font-medium">{i.title}</div>
                   <div className="text-muted-foreground">{i.subtitle}</div>
                 </div>
@@ -158,12 +272,22 @@ function ShoppingDetailPage() {
   );
 }
 
-function MetricTile({ label, value, unit }: { label: string; value: string | null; unit?: string }) {
+function MetricTile({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: string | null;
+  unit?: string;
+}) {
   return (
     <div className="panel p-3">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
       {value === null ? (
-        <div className="mt-1.5"><DataUnavailable /></div>
+        <div className="mt-1.5">
+          <DataUnavailable />
+        </div>
       ) : (
         <div className="mt-1 flex items-baseline gap-1">
           <span className="metric-value text-lg">{value}</span>
@@ -185,34 +309,96 @@ function EnergyChart({ data }: { data: { time: string; consumo: number; eficienc
               <stop offset="100%" stopColor="var(--accent-blue)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke="oklch(0.35 0.03 260 / 30%)" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid
+            stroke="oklch(0.35 0.03 260 / 30%)"
+            strokeDasharray="3 3"
+            vertical={false}
+          />
           <XAxis dataKey="time" stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 11 }} />
           <YAxis yAxisId="l" stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 11 }} />
-          <YAxis yAxisId="r" orientation="right" stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 11 }} />
-          <Tooltip contentStyle={{ background: "oklch(0.20 0.03 260)", border: "1px solid oklch(0.35 0.03 260)", borderRadius: 8 }} />
+          <YAxis
+            yAxisId="r"
+            orientation="right"
+            stroke="oklch(0.6 0.02 250)"
+            tick={{ fontSize: 11 }}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "oklch(0.20 0.03 260)",
+              border: "1px solid oklch(0.35 0.03 260)",
+              borderRadius: 8,
+            }}
+          />
           <Legend wrapperStyle={{ fontSize: 11 }} />
-          <Area yAxisId="r" type="monotone" dataKey="consumo" name="Consumo" stroke="var(--accent-blue)" strokeWidth={2} fill="url(#detCons)" />
-          <Line yAxisId="l" type="monotone" dataKey="eficiencia" name="Eficiência" stroke="var(--accent-green)" strokeWidth={2} dot={{ r: 2 }} />
+          <Area
+            yAxisId="r"
+            type="monotone"
+            dataKey="consumo"
+            name="Consumo"
+            stroke="var(--accent-blue)"
+            strokeWidth={2}
+            fill="url(#detCons)"
+          />
+          <Line
+            yAxisId="l"
+            type="monotone"
+            dataKey="eficiencia"
+            name="Eficiência"
+            stroke="var(--accent-green)"
+            strokeWidth={2}
+            dot={{ r: 2 }}
+          />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-function PowerBars({ title, data, color, icon, unavailable }: { title: string; data: { name: string; kw: number }[]; color: string; icon: React.ReactNode; unavailable?: boolean }) {
+function PowerBars({
+  title,
+  data,
+  color,
+  icon,
+  unavailable,
+}: {
+  title: string;
+  data: { name: string; kw: number }[];
+  color: string;
+  icon: React.ReactNode;
+  unavailable?: boolean;
+}) {
   return (
     <div className="panel p-4">
-      <div className="mb-3 flex items-center gap-2">{icon}<h3 className="text-sm font-semibold">{title}</h3></div>
+      <div className="mb-3 flex items-center gap-2">
+        {icon}
+        <h3 className="text-sm font-semibold">{title}</h3>
+      </div>
       {unavailable ? (
         <DataUnavailable />
       ) : (
         <div className="h-48">
           <ResponsiveContainer>
             <BarChart data={data} layout="vertical" margin={{ left: 4, right: 12 }}>
-              <CartesianGrid stroke="oklch(0.35 0.03 260 / 25%)" strokeDasharray="3 3" horizontal={false} />
+              <CartesianGrid
+                stroke="oklch(0.35 0.03 260 / 25%)"
+                strokeDasharray="3 3"
+                horizontal={false}
+              />
               <XAxis type="number" stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 11 }} />
-              <YAxis dataKey="name" type="category" stroke="oklch(0.6 0.02 250)" width={90} tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: "oklch(0.20 0.03 260)", border: "1px solid oklch(0.35 0.03 260)", borderRadius: 8 }} />
+              <YAxis
+                dataKey="name"
+                type="category"
+                stroke="oklch(0.6 0.02 250)"
+                width={90}
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "oklch(0.20 0.03 260)",
+                  border: "1px solid oklch(0.35 0.03 260)",
+                  borderRadius: 8,
+                }}
+              />
               <Bar dataKey="kw" fill={color} radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>

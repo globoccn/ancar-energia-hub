@@ -19,8 +19,12 @@ export function ShoppingCard({ shopping }: { shopping: Shopping }) {
           <div className="min-w-0">
             <div className="truncate text-sm font-medium text-foreground">{shopping.name}</div>
             <div className="text-[11px] text-muted-foreground">
-              <span className="rounded bg-muted/60 px-1.5 py-0.5 font-medium text-foreground/80">{shopping.code}</span>
-              <span className="ml-2">{shopping.city}/{shopping.stateCode}</span>
+              <span className="rounded bg-muted/60 px-1.5 py-0.5 font-medium text-foreground/80">
+                {shopping.code}
+              </span>
+              <span className="ml-2">
+                {shopping.city}/{shopping.stateCode}
+              </span>
             </div>
           </div>
         </div>
@@ -28,8 +32,16 @@ export function ShoppingCard({ shopping }: { shopping: Shopping }) {
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-        <Metric value={formatNumber(shopping.powerKW / 1000, { maximumFractionDigits: 2 })} unit="MW" label="Potência" />
-        <Metric value={formatNumber(shopping.efficiencyKWTR, { maximumFractionDigits: 2 })} unit="kW/TR" label="Eficiência" />
+        <Metric
+          value={formatNumber(shopping.powerKW / 1000, { maximumFractionDigits: 2 })}
+          unit="MW"
+          label="Potência"
+        />
+        <Metric
+          value={formatNumber(shopping.efficiencyKWTR, { maximumFractionDigits: 2 })}
+          unit="kW/TR"
+          label="Eficiência"
+        />
         <Metric value={String(shopping.esgScore)} unit="ESG" label="Score" />
       </div>
     </Link>

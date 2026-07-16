@@ -1,99 +1,118 @@
-import { Bell, Calendar, ChevronDown, GitCompareArrows, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Calendar, ChevronDown, GitCompareArrows, Search } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { formatRelative } from "@/utils/format";
-import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { shoppings } from "@/data/mock/shoppings";
 
+const controlClass =
+  "h-9 shrink-0 gap-2 rounded-lg border-border/55 bg-[color-mix(in_oklab,var(--card)_76%,transparent)] px-3 text-[12px] font-medium text-foreground/90 shadow-none hover:bg-accent/55 hover:text-foreground";
+
 export function TopBar() {
-  const { lastUpdate } = useAutoRefresh();
-
   return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-      <div className="flex h-14 items-center gap-3 px-4">
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+    <header className="sticky top-0 z-30 border-b border-border/55 bg-[color-mix(in_oklab,var(--background)_92%,transparent)] backdrop-blur-xl">
+      <div className="flex h-16 min-w-0 items-center gap-3 px-3 sm:px-4 lg:px-5">
+        <SidebarTrigger className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground md:hidden" />
 
-        <div className="relative w-full max-w-xl">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="hidden w-[145px] shrink-0 items-center md:flex">
+          <img src="/images/logo-ancar.png" alt="Ancar" className="h-11 w-auto object-contain" />
+        </div>
+
+        <div className="relative min-w-[180px] flex-1 md:max-w-[500px]">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label="Buscar shopping ou métrica"
             placeholder="Buscar shopping ou métrica..."
-            className="h-9 pl-9 bg-card/60 border-border/60"
+            className="h-10 rounded-xl border-border/55 bg-[color-mix(in_oklab,var(--card)_72%,transparent)] pl-10 pr-4 text-sm shadow-none placeholder:text-muted-foreground/75 focus-visible:border-primary/45 focus-visible:ring-primary/20"
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9 gap-2 bg-card/60">
-              Todos os Shoppings <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-h-80 w-64 overflow-y-auto">
-            <DropdownMenuLabel>Selecionar shopping</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Todos os Shoppings</DropdownMenuItem>
-            {shoppings.map((s) => (
-              <DropdownMenuItem key={s.id}>
-                <span className="mr-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium">{s.code}</span>
-                {s.name}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="hidden min-w-0 items-center gap-2 xl:flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`${controlClass} min-w-[166px] justify-between`}
+              >
+                <span>Todos os Shoppings</span>
+                <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-80 w-72 overflow-y-auto" align="start">
+              <DropdownMenuLabel>Selecionar shopping</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Todos os Shoppings</DropdownMenuItem>
+              {shoppings.map((shopping) => (
+                <DropdownMenuItem key={shopping.id}>
+                  <span className="mr-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold">
+                    {shopping.code}
+                  </span>
+                  {shopping.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9 gap-2 bg-card/60">
-              <Calendar className="h-3.5 w-3.5 opacity-70" /> Hoje <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {["Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "Este mês", "Personalizado"].map((p) => (
-              <DropdownMenuItem key={p}>{p}</DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className={controlClass}>
+                <Calendar className="h-3.5 w-3.5 opacity-70" />
+                Hoje
+                <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {[
+                "Hoje",
+                "Ontem",
+                "Últimos 7 dias",
+                "Últimos 30 dias",
+                "Este mês",
+                "Personalizado",
+              ].map((period) => (
+                <DropdownMenuItem key={period}>{period}</DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <Button variant="outline" size="sm" className="h-9 gap-2 bg-card/60">
-          <GitCompareArrows className="h-3.5 w-3.5 opacity-70" /> Comparar
-        </Button>
+          <Button variant="outline" size="sm" className={controlClass}>
+            <GitCompareArrows className="h-3.5 w-3.5 opacity-70" />
+            Comparar
+            <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+          </Button>
+        </div>
 
-        <div className="ml-auto flex items-center gap-4">
-          <div className="hidden items-center gap-2 md:flex">
+        <div className="ml-auto flex shrink-0 items-center gap-3 lg:gap-4">
+          <div className="hidden items-center gap-2 border-r border-border/55 pr-4 lg:flex">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-green)] opacity-60" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-green)] opacity-55" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent-green)]" />
             </span>
             <span className="text-xs text-muted-foreground">Sistema Operacional</span>
           </div>
 
-          <div className="hidden text-xs text-muted-foreground md:block">
-            Atualizado {formatRelative(lastUpdate.toISOString())}
-          </div>
-
-          <Button variant="ghost" size="icon" className="relative h-9 w-9">
-            <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--accent-red)]" />
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60">
-                <Avatar className="h-8 w-8 border border-border/60">
-                  <AvatarFallback className="bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-purple)] text-xs font-semibold text-foreground">
+              <button className="flex items-center gap-2 rounded-xl px-1.5 py-1 outline-none transition-colors hover:bg-muted/45 focus-visible:ring-1 focus-visible:ring-ring">
+                <Avatar className="h-9 w-9 border border-border/70 shadow-sm">
+                  <AvatarFallback className="bg-gradient-to-br from-[color-mix(in_oklab,var(--accent-blue)_45%,var(--card))] to-[color-mix(in_oklab,var(--accent-purple)_35%,var(--card))] text-xs font-semibold text-foreground">
                     AG
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden text-left leading-tight md:block">
-                  <div className="text-xs font-medium">Alex G.</div>
-                  <div className="text-[10px] text-muted-foreground">Administrador</div>
+                <div className="hidden min-w-[82px] text-left leading-tight 2xl:block">
+                  <div className="text-xs font-medium text-foreground">Alex G.</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">Administrador</div>
                 </div>
-                <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground md:block" />
+                <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground 2xl:block" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

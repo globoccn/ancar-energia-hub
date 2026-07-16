@@ -1,8 +1,27 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Activity, BarChart3, Bell, FileText, Home, Leaf, Settings, Store, Trophy } from "lucide-react";
 import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
-  SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  Activity,
+  BarChart3,
+  Bell,
+  CircleHelp,
+  FileText,
+  Home,
+  Leaf,
+  LogOut,
+  Settings,
+  Store,
+  Trophy,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -17,39 +36,47 @@ const items = [
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ];
 
+const navigationButtonClass =
+  "mx-auto !h-11 !w-11 justify-center !rounded-xl !p-0 text-sidebar-foreground/65 transition-all duration-200 hover:bg-sidebar-accent/75 hover:text-sidebar-foreground data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:shadow-[inset_0_0_0_1px_oklch(0.78_0.16_190/22%),0_0_24px_-12px_oklch(0.78_0.16_190/80%)] md:[&>span]:hidden";
+
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isMobile, state } = useSidebar();
+  const compact = state === "collapsed" && !isMobile;
+  const pathname = useRouterState({ select: (routerState) => routerState.location.pathname });
   const isActive = (url: string) => (url === "/" ? pathname === "/" : pathname.startsWith(url));
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-[var(--accent-cyan)] to-[var(--accent-blue)] shadow-inner">
-            <Activity className="h-5 w-5 text-[var(--sidebar)]" strokeWidth={2.5} />
-          </div>
-          {!collapsed && (
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight text-sidebar-foreground">ancar</div>
-              <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Energy · ESG</div>
-            </div>
-          )}
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border/75">
+      <SidebarHeader className="h-16 justify-center border-b border-sidebar-border/70 px-2 py-0">
+        <div className="hidden h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[color-mix(in_oklab,var(--accent-cyan)_88%,white)] to-[var(--accent-blue)] shadow-[0_8px_28px_-14px_oklch(0.82_0.16_195/85%)] md:flex">
+          <Activity className="h-5 w-5 text-[var(--sidebar)]" strokeWidth={2.4} />
         </div>
+        <img
+          src="/images/logo-ancar.png"
+          alt="Ancar"
+          className="h-9 w-auto object-contain md:hidden"
+        />
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Portfólio</SidebarGroupLabel>}
+      <SidebarContent className="overflow-x-hidden">
+        <SidebarGroup className="px-2 py-4 md:py-5">
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1.5 md:items-center md:gap-2">
               {items.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                <SidebarMenuItem key={item.url} className="w-full md:flex md:justify-center">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    tooltip={item.title}
+                    className={navigationButtonClass}
+                  >
+                    <Link
+                      to={item.url}
+                      aria-label={compact ? item.title : undefined}
+                      className="flex items-center gap-3 md:justify-center"
+                    >
+                      <item.icon className="!h-[19px] !w-[19px]" strokeWidth={1.8} />
+                      {!compact && <span>{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -59,15 +86,21 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border">
-        {!collapsed ? (
-          <div className="px-2 py-2 text-[10px] leading-relaxed text-muted-foreground">
-            <div>v1.0 · Dashboard operacional</div>
-            <div className="mt-0.5 opacity-70">© Ancar 2026</div>
-          </div>
-        ) : (
-          <div className="h-4" />
-        )}
+      <SidebarFooter className="border-t border-sidebar-border/70 px-2 py-3">
+        <SidebarMenu className="gap-1.5 md:items-center">
+          <SidebarMenuItem className="w-full md:flex md:justify-center">
+            <SidebarMenuButton tooltip="Ajuda" className={navigationButtonClass}>
+              <CircleHelp className="!h-[19px] !w-[19px]" strokeWidth={1.8} />
+              {!compact && <span>Ajuda</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="w-full md:flex md:justify-center">
+            <SidebarMenuButton tooltip="Sair" className={navigationButtonClass}>
+              <LogOut className="!h-[19px] !w-[19px]" strokeWidth={1.8} />
+              {!compact && <span>Sair</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

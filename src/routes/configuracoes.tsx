@@ -42,7 +42,13 @@ function ConfiguracoesPage() {
           <div className="panel overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
-                <tr><th className="p-3 text-left">Sigla</th><th className="p-3 text-left">Nome</th><th className="p-3 text-left">Cidade</th><th className="p-3 text-left">Estado</th><th className="p-3 text-right">Cobertura</th></tr>
+                <tr>
+                  <th className="p-3 text-left">Sigla</th>
+                  <th className="p-3 text-left">Nome</th>
+                  <th className="p-3 text-left">Cidade</th>
+                  <th className="p-3 text-left">Estado</th>
+                  <th className="p-3 text-right">Cobertura</th>
+                </tr>
               </thead>
               <tbody>
                 {shoppings.map((s) => (
@@ -51,7 +57,9 @@ function ConfiguracoesPage() {
                     <td className="p-3">{s.name}</td>
                     <td className="p-3 text-muted-foreground">{s.city}</td>
                     <td className="p-3 text-muted-foreground">{s.state}</td>
-                    <td className="p-3 text-right metric-value">{s.dataAvailability.coveragePct}%</td>
+                    <td className="p-3 text-right metric-value">
+                      {s.dataAvailability.coveragePct}%
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -83,8 +91,14 @@ function ConfiguracoesPage() {
 
         <TabsContent value="emissoes" className="mt-4">
           <div className="panel space-y-3 p-4">
-            <Field label="Fator de emissão da rede (t CO₂ / MWh)" value={emissionFactor} onChange={setEmissionFactor} />
-            <p className="text-xs text-muted-foreground">Base ONS. Aplicado em todas as métricas de CO₂ evitado e emissões.</p>
+            <Field
+              label="Fator de emissão da rede (t CO₂ / MWh)"
+              value={emissionFactor}
+              onChange={setEmissionFactor}
+            />
+            <p className="text-xs text-muted-foreground">
+              Base ONS. Aplicado em todas as métricas de CO₂ evitado e emissões.
+            </p>
           </div>
         </TabsContent>
 
@@ -92,7 +106,11 @@ function ConfiguracoesPage() {
           <div className="panel overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
-                <tr><th className="p-3 text-left">Nome</th><th className="p-3 text-left">E-mail</th><th className="p-3 text-left">Perfil</th></tr>
+                <tr>
+                  <th className="p-3 text-left">Nome</th>
+                  <th className="p-3 text-left">E-mail</th>
+                  <th className="p-3 text-left">Perfil</th>
+                </tr>
               </thead>
               <tbody>
                 {[
@@ -102,7 +120,9 @@ function ConfiguracoesPage() {
                   ["Camila Torres", "camila@ancar.com.br", "Visualização"],
                 ].map(([n, e, p]) => (
                   <tr key={e} className="border-t border-border/30">
-                    <td className="p-3">{n}</td><td className="p-3 text-muted-foreground">{e}</td><td className="p-3">{p}</td>
+                    <td className="p-3">{n}</td>
+                    <td className="p-3 text-muted-foreground">{e}</td>
+                    <td className="p-3">{p}</td>
                   </tr>
                 ))}
               </tbody>
@@ -113,8 +133,12 @@ function ConfiguracoesPage() {
         <TabsContent value="unidades" className="mt-4">
           <div className="panel grid grid-cols-2 gap-4 p-4 md:grid-cols-3">
             {[
-              ["Energia", "MWh"], ["Potência", "kW"], ["Eficiência", "kW/TR"],
-              ["Temperatura", "°C"], ["Vazão", "L/s"], ["Emissões", "t CO₂"],
+              ["Energia", "MWh"],
+              ["Potência", "kW"],
+              ["Eficiência", "kW/TR"],
+              ["Temperatura", "°C"],
+              ["Vazão", "L/s"],
+              ["Emissões", "t CO₂"],
             ].map(([k, v]) => (
               <div key={k}>
                 <Label className="text-xs text-muted-foreground">{k}</Label>
@@ -128,17 +152,32 @@ function ConfiguracoesPage() {
           <div className="panel overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground">
-                <tr><th className="p-3 text-left">Shopping</th><th className="p-3 text-center">Chillers</th><th className="p-3 text-center">Periféricos</th><th className="p-3 text-center">Temperaturas</th><th className="p-3 text-center">Vazão</th><th className="p-3 text-right">Cobertura</th></tr>
+                <tr>
+                  <th className="p-3 text-left">Shopping</th>
+                  <th className="p-3 text-center">Chillers</th>
+                  <th className="p-3 text-center">Periféricos</th>
+                  <th className="p-3 text-center">Temperaturas</th>
+                  <th className="p-3 text-center">Vazão</th>
+                  <th className="p-3 text-right">Cobertura</th>
+                </tr>
               </thead>
               <tbody>
                 {shoppings.map((s) => (
                   <tr key={s.id} className="border-t border-border/30">
-                    <td className="p-3">{s.code} · {s.name}</td>
+                    <td className="p-3">
+                      {s.code} · {s.name}
+                    </td>
                     <td className="p-3 text-center">{s.dataAvailability.chillers ? "✓" : "—"}</td>
-                    <td className="p-3 text-center">{s.dataAvailability.perifericos ? "✓" : "—"}</td>
-                    <td className="p-3 text-center">{s.dataAvailability.temperaturas ? "✓" : "—"}</td>
+                    <td className="p-3 text-center">
+                      {s.dataAvailability.perifericos ? "✓" : "—"}
+                    </td>
+                    <td className="p-3 text-center">
+                      {s.dataAvailability.temperaturas ? "✓" : "—"}
+                    </td>
                     <td className="p-3 text-center">{s.dataAvailability.vazao ? "✓" : "—"}</td>
-                    <td className="p-3 text-right metric-value">{s.dataAvailability.coveragePct}%</td>
+                    <td className="p-3 text-right metric-value">
+                      {s.dataAvailability.coveragePct}%
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -151,12 +190,18 @@ function ConfiguracoesPage() {
             <div className="flex items-center justify-between rounded-md bg-muted/20 p-3">
               <div>
                 <div className="text-sm font-medium">Usar dados mockados</div>
-                <div className="text-xs text-muted-foreground">Quando desativado, a aplicação consulta a REST API do n8n.</div>
+                <div className="text-xs text-muted-foreground">
+                  Quando desativado, a aplicação consulta a REST API do n8n.
+                </div>
               </div>
               <Switch checked={useMock} onCheckedChange={setUseMock} />
             </div>
             <Field label="Endpoint REST API (n8n)" value={apiUrl} onChange={setApiUrl} />
-            <Field label="Intervalo de atualização (segundos)" value={refresh} onChange={setRefresh} />
+            <Field
+              label="Intervalo de atualização (segundos)"
+              value={refresh}
+              onChange={setRefresh}
+            />
             <div className="flex justify-end">
               <Button onClick={() => toast.success("Configurações salvas (demo)")}>Salvar</Button>
             </div>
@@ -165,7 +210,10 @@ function ConfiguracoesPage() {
 
         <TabsContent value="aparencia" className="mt-4">
           <div className="panel space-y-3 p-4">
-            <div className="text-sm text-muted-foreground">O tema desta aplicação é fixado em modo escuro corporativo. Ajustes de densidade e destaques adicionais poderão ser configurados aqui.</div>
+            <div className="text-sm text-muted-foreground">
+              O tema desta aplicação é fixado em modo escuro corporativo. Ajustes de densidade e
+              destaques adicionais poderão ser configurados aqui.
+            </div>
             <div className="flex items-center justify-between rounded-md bg-muted/20 p-3">
               <span className="text-sm">Densidade compacta</span>
               <Switch defaultChecked />
@@ -181,11 +229,26 @@ function ConfiguracoesPage() {
   );
 }
 
-function Field({ label, defaultValue, value, onChange }: { label: string; defaultValue?: string; value?: string; onChange?: (v: string) => void }) {
+function Field({
+  label,
+  defaultValue,
+  value,
+  onChange,
+}: {
+  label: string;
+  defaultValue?: string;
+  value?: string;
+  onChange?: (v: string) => void;
+}) {
   return (
     <div>
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input defaultValue={defaultValue} value={value} onChange={onChange ? (e) => onChange(e.target.value) : undefined} className="mt-1" />
+      <Input
+        defaultValue={defaultValue}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        className="mt-1"
+      />
     </div>
   );
 }

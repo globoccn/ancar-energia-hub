@@ -1,4 +1,12 @@
-import type { EnergyDataPoint, Alert, Insight, Equipment, ESGMetrics, PortfolioKpi, RankingItem } from "@/types";
+import type {
+  EnergyDataPoint,
+  Alert,
+  Insight,
+  Equipment,
+  ESGMetrics,
+  PortfolioKpi,
+  RankingItem,
+} from "@/types";
 import { shoppings } from "./shoppings";
 
 // PRNG determinístico para dados estáveis por seed
@@ -78,19 +86,49 @@ export function makePortfolioSeries(): EnergyDataPoint[] {
   return points;
 }
 
-export function makeRanking(metric: "eficiencia" | "consumo" | "economia" | "esg" | "qualidade" | "alertas" | "disponibilidade" = "eficiencia"): RankingItem[] {
+export function makeRanking(
+  metric:
+    | "eficiencia"
+    | "consumo"
+    | "economia"
+    | "esg"
+    | "qualidade"
+    | "alertas"
+    | "disponibilidade" = "eficiencia",
+): RankingItem[] {
   const rnd = seeded(metric.length * 13);
   const list = [...shoppings].map((s) => {
     let value = 0;
     let unit = "";
     switch (metric) {
-      case "eficiencia": value = s.efficiencyKWTR; unit = "kW/TR"; break;
-      case "consumo": value = s.consumptionMWh; unit = "MWh"; break;
-      case "economia": value = (s.savingsBRL ?? 0) / 1000; unit = "R$ mil"; break;
-      case "esg": value = s.esgScore; unit = "pts"; break;
-      case "qualidade": value = s.dataAvailability.coveragePct; unit = "%"; break;
-      case "alertas": value = Math.floor(rnd() * 12); unit = ""; break;
-      case "disponibilidade": value = s.dataAvailability.coveragePct; unit = "%"; break;
+      case "eficiencia":
+        value = s.efficiencyKWTR;
+        unit = "kW/TR";
+        break;
+      case "consumo":
+        value = s.consumptionMWh;
+        unit = "MWh";
+        break;
+      case "economia":
+        value = (s.savingsBRL ?? 0) / 1000;
+        unit = "R$ mil";
+        break;
+      case "esg":
+        value = s.esgScore;
+        unit = "pts";
+        break;
+      case "qualidade":
+        value = s.dataAvailability.coveragePct;
+        unit = "%";
+        break;
+      case "alertas":
+        value = Math.floor(rnd() * 12);
+        unit = "";
+        break;
+      case "disponibilidade":
+        value = s.dataAvailability.coveragePct;
+        unit = "%";
+        break;
     }
     return { s, value, unit };
   });
@@ -109,11 +147,36 @@ export function makeRanking(metric: "eficiencia" | "consumo" | "economia" | "esg
 }
 
 const alertTemplates = [
-  { equipment: "Chiller 02", title: "Delta T abaixo da meta", description: "Delta T operando em 3,8 °C nas últimas 4 horas.", recommendation: "Verificar vazão do circuito primário e válvula de balanceamento." },
-  { equipment: "Periféricos", title: "Consumo acima do esperado", description: "Consumo 18% acima do baseline nas últimas 24h.", recommendation: "Revisar setpoints e cronograma de operação." },
-  { equipment: "Torre 01", title: "Aproximação elevada", description: "Aproximação superior a 6 °C.", recommendation: "Inspecionar enchimento e distribuição de água." },
-  { equipment: "Bomba CAP-02", title: "Falha de comunicação", description: "Sensor sem leitura há 12 minutos.", recommendation: "Validar rede Modbus e alimentação do gateway." },
-  { equipment: "AHU Piso L2", title: "Temperatura fora da faixa", description: "Insuflamento a 15,8 °C, meta 12 °C.", recommendation: "Verificar válvula de água gelada." },
+  {
+    equipment: "Chiller 02",
+    title: "Delta T abaixo da meta",
+    description: "Delta T operando em 3,8 °C nas últimas 4 horas.",
+    recommendation: "Verificar vazão do circuito primário e válvula de balanceamento.",
+  },
+  {
+    equipment: "Periféricos",
+    title: "Consumo acima do esperado",
+    description: "Consumo 18% acima do baseline nas últimas 24h.",
+    recommendation: "Revisar setpoints e cronograma de operação.",
+  },
+  {
+    equipment: "Torre 01",
+    title: "Aproximação elevada",
+    description: "Aproximação superior a 6 °C.",
+    recommendation: "Inspecionar enchimento e distribuição de água.",
+  },
+  {
+    equipment: "Bomba CAP-02",
+    title: "Falha de comunicação",
+    description: "Sensor sem leitura há 12 minutos.",
+    recommendation: "Validar rede Modbus e alimentação do gateway.",
+  },
+  {
+    equipment: "AHU Piso L2",
+    title: "Temperatura fora da faixa",
+    description: "Insuflamento a 15,8 °C, meta 12 °C.",
+    recommendation: "Verificar válvula de água gelada.",
+  },
 ];
 
 export function makeAlerts(shoppingId?: string): Alert[] {
@@ -148,10 +211,36 @@ export function makeAlerts(shoppingId?: string): Alert[] {
 
 export function makeInsights(): Insight[] {
   return [
-    { id: "i1", type: "alerta", icon: "warning", title: "Delta T abaixo da meta em 4 sites", subtitle: "Impacta a eficiência do sistema de HVAC." },
-    { id: "i2", type: "oportunidade", icon: "settings", title: "Periféricos acima do ideal em 3 shoppings", subtitle: "Recomenda-se ajuste de setpoints." },
-    { id: "i3", type: "destaque", icon: "trend", title: "Melhor performance hoje", subtitle: "CenterVale Shopping", detail: "Eficiência 0,58 kW/TR" },
-    { id: "i4", type: "oportunidade", icon: "trending-down", title: "Maior potencial de economia", subtitle: "Porto Velho Shopping", detail: "Economia estimada de R$ 31 mil/mês" },
+    {
+      id: "i1",
+      type: "alerta",
+      icon: "warning",
+      title: "Delta T abaixo da meta em 4 sites",
+      subtitle: "Impacta a eficiência do sistema de HVAC.",
+    },
+    {
+      id: "i2",
+      type: "oportunidade",
+      icon: "settings",
+      title: "Periféricos acima do ideal em 3 shoppings",
+      subtitle: "Recomenda-se ajuste de setpoints.",
+    },
+    {
+      id: "i3",
+      type: "destaque",
+      icon: "trend",
+      title: "Melhor performance hoje",
+      subtitle: "CenterVale Shopping",
+      detail: "Eficiência 0,58 kW/TR",
+    },
+    {
+      id: "i4",
+      type: "oportunidade",
+      icon: "trending-down",
+      title: "Maior potencial de economia",
+      subtitle: "Porto Velho Shopping",
+      detail: "Economia estimada de R$ 31 mil/mês",
+    },
   ];
 }
 
@@ -178,7 +267,9 @@ export function makeEquipments(seed: number): Equipment[] {
   const list: Equipment[] = [];
   for (let i = 1; i <= 4; i++) {
     list.push({
-      id: `chi-${i}`, name: `Chiller ${i.toString().padStart(2, "0")}`, type: "chiller",
+      id: `chi-${i}`,
+      name: `Chiller ${i.toString().padStart(2, "0")}`,
+      type: "chiller",
       powerKW: Math.round(180 + rnd() * 80),
       status: rnd() > 0.85 ? "manutencao" : rnd() > 0.6 ? "standby" : "operando",
       efficiencyKWTR: +(0.55 + rnd() * 0.35).toFixed(2),
@@ -186,8 +277,20 @@ export function makeEquipments(seed: number): Equipment[] {
     });
   }
   for (let i = 1; i <= 3; i++) {
-    list.push({ id: `tor-${i}`, name: `Torre ${i.toString().padStart(2, "0")}`, type: "torre", powerKW: Math.round(40 + rnd() * 30), status: "operando" });
-    list.push({ id: `bmb-${i}`, name: `Bomba ${i.toString().padStart(2, "0")}`, type: "bomba", powerKW: Math.round(20 + rnd() * 25), status: "operando" });
+    list.push({
+      id: `tor-${i}`,
+      name: `Torre ${i.toString().padStart(2, "0")}`,
+      type: "torre",
+      powerKW: Math.round(40 + rnd() * 30),
+      status: "operando",
+    });
+    list.push({
+      id: `bmb-${i}`,
+      name: `Bomba ${i.toString().padStart(2, "0")}`,
+      type: "bomba",
+      powerKW: Math.round(20 + rnd() * 25),
+      status: "operando",
+    });
   }
   return list;
 }
