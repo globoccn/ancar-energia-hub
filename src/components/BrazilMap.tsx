@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { shoppings } from "@/data/mock/shoppings";
 import {
   BRAZIL_MAP_BOUNDS,
   BRAZIL_MAP_HEIGHT,
@@ -18,14 +17,42 @@ const STATE_COLOR: Record<string, string> = {
   RO: "var(--accent-cyan)",
 };
 
-const CLUSTER_OFFSETS = [
-  { x: -8, y: -7 },
-  { x: 7, y: -7 },
-  { x: -10, y: 7 },
-  { x: 9, y: 7 },
-  { x: 0, y: -13 },
-  { x: 0, y: 13 },
-];
+const LEGEND_ORDER = ["RJ", "SP", "CE", "RN", "MT", "RO"];
+
+// Âncoras visuais centralizadas dentro de cada estado/região do mapa.
+// Elas preservam a leitura geográfica, mas evitam que pontos próximos à costa
+// fiquem sobrepostos ou extrapolem o contorno do Brasil.
+const STATE_ANCHORS: Record<string, { x: number; y: number }> = {
+  SP: { x: 286, y: 252 },
+  RJ: { x: 320, y: 247 },
+  CE: { x: 365, y: 107 },
+  RN: { x: 392, y: 119 },
+  MT: { x: 192, y: 191 },
+  RO: { x: 113, y: 139 },
+};
+
+const STATE_CLUSTER_OFFSETS: Record<string, { x: number; y: number }[]> = {
+  RJ: [
+    { x: -9, y: -8 },
+    { x: 0, y: -10 },
+    { x: 9, y: -7 },
+    { x: -9, y: 7 },
+    { x: 0, y: 9 },
+    { x: 9, y: 6 },
+  ],
+  SP: [
+    { x: -8, y: -7 },
+    { x: 7, y: -6 },
+    { x: -7, y: 7 },
+    { x: 8, y: 7 },
+  ],
+  CE: [
+    { x: -7, y: -7 },
+    { x: 7, y: -6 },
+    { x: -6, y: 7 },
+    { x: 7, y: 7 },
+  ],
+};
 
 function project(lat: number, lng: number) {
   const x =
@@ -35,6 +62,10 @@ function project(lat: number, lng: number) {
     ((BRAZIL_MAP_BOUNDS.maxLat - lat) / (BRAZIL_MAP_BOUNDS.maxLat - BRAZIL_MAP_BOUNDS.minLat)) *
     BRAZIL_MAP_HEIGHT;
   return { x, y };
+}
+
+function clampMarker(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
 }
 
 type Marker = Shopping & { markerX: number; markerY: number; color: string };
@@ -47,24 +78,27 @@ function makeMarkers(items: Shopping[]): Marker[] {
     byState.set(shopping.stateCode, current);
   });
 
-  return Array.from(byState.entries()).flatMap(([stateCode, stateItems]) =>
-    stateItems
-      .sort((a, b) => a.code.localeCompare(b.code))
-      .map((shopping, index) => {
-        const base = project(shopping.latitude, shopping.longitude);
-        const offset =
-          stateItems.length > 1 ? CLUSTER_OFFSETS[index % CLUSTER_OFFSETS.length] : null;
-        return {
-          ...shopping,
-          markerX: base.x + (offset?.x ?? 0),
-          markerY: base.y + (offset?.y ?? 0),
-          color: STATE_COLOR[stateCode] ?? "var(--accent-cyan)",
-        };
-      }),
-  );
+  return Array.from(byState.entries()).flatMap(([stateCode, stateItems]) => {
+    const sorted = [...stateItems].sort((a, b) => a.code.localeCompare(b.code));
+    const anchor = STATE_ANCHORS[stateCode];
+    const offsets = STATE_CLUSTER_OFFSETS[stateCode] ?? [{ x: 0, y: 0 }];
+
+    return sorted.map((shopping, index) => {
+      const geographicPosition = project(shopping.latitude, shopping.longitude);
+      const base = anchor ?? geographicPosition;
+      const offset = sorted.length > 1 ? offsets[index % offsets.length] : { x: 0, y: 0 };
+
+      return {
+        ...shopping,
+        markerX: clampMarker(base.x + offset.x, 14, BRAZIL_MAP_WIDTH - 14),
+        markerY: clampMarker(base.y + offset.y, 14, BRAZIL_MAP_HEIGHT - 14),
+        color: STATE_COLOR[stateCode] ?? "var(--accent-cyan)",
+      };
+    });
+  });
 }
 
-export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
+export function BrazilMap({ items = [] }: { items?: Shopping[] }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const grouped = useMemo(() => {
@@ -147,9 +181,10 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
           return (
             <g
               key={marker.id}
-              className="cursor-pointer"
+              className="cursor-pointer outline-none"
               onMouseEnter={() => setHoveredId(marker.id)}
               onFocus={() => setHoveredId(marker.id)}
+              onBlur={() => setHoveredId(null)}
               tabIndex={0}
               role="button"
               aria-label={`${marker.code}, ${marker.city}/${marker.stateCode}`}
@@ -157,7 +192,7 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
               <circle
                 cx={marker.markerX}
                 cy={marker.markerY}
-                r={active ? 10 : 8}
+                r={active ? 9.5 : 7.5}
                 fill={marker.color}
                 opacity={active ? 0.3 : 0.18}
                 filter="url(#map-marker-glow)"
@@ -165,10 +200,10 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
               <circle
                 cx={marker.markerX}
                 cy={marker.markerY}
-                r={active ? 4.7 : 3.7}
+                r={active ? 4.5 : 3.5}
                 fill={marker.color}
-                stroke="oklch(0.98 0.01 240 / 62%)"
-                strokeWidth={active ? 1.4 : 0.8}
+                stroke="oklch(0.98 0.01 240 / 70%)"
+                strokeWidth={active ? 1.35 : 0.8}
               />
             </g>
           );
@@ -197,22 +232,20 @@ export function BrazilMap({ items = shoppings }: { items?: Shopping[] }) {
       </svg>
 
       <div className="mt-2 grid grid-cols-3 gap-x-3 gap-y-1.5 text-[10px] text-muted-foreground">
-        {Object.entries(grouped)
-          .sort(([, a], [, b]) => b.length - a.length)
-          .map(([uf, list]) => (
-            <div key={uf} className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-2 w-2 rounded-full shadow-[0_0_8px_currentColor]"
-                style={{
-                  color: STATE_COLOR[uf] ?? "var(--accent-cyan)",
-                  background: "currentColor",
-                }}
-              />
-              <span>
-                {uf} ({list.length})
-              </span>
-            </div>
-          ))}
+        {LEGEND_ORDER.filter((uf) => grouped[uf]?.length).map((uf) => (
+          <div key={uf} className="flex items-center gap-1.5">
+            <span
+              className="inline-block h-2 w-2 rounded-full shadow-[0_0_8px_currentColor]"
+              style={{
+                color: STATE_COLOR[uf] ?? "var(--accent-cyan)",
+                background: "currentColor",
+              }}
+            />
+            <span>
+              {uf} ({grouped[uf].length})
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

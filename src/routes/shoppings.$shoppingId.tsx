@@ -17,7 +17,8 @@ import {
 } from "recharts";
 import { dashboardService } from "@/services/dashboardService";
 import type { ShoppingDetail } from "@/types";
-import { PageHeader, LoadingBlock } from "@/components/ui-helpers";
+import { EmptyState, LoadingBlock } from "@/components/ui-helpers";
+import { chartTooltipStyle, InternalPage, StatusPill } from "@/components/InternalPage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DataUnavailable } from "@/components/DataUnavailable";
 import {
@@ -55,16 +56,25 @@ function ShoppingDetailPage() {
   if (d === undefined) return <LoadingBlock h={500} />;
   if (d === null)
     return (
-      <div className="panel p-10 text-center">
-        Shopping não encontrado.{" "}
-        <Link to="/shoppings" className="text-[var(--accent-cyan)] hover:underline">
-          Voltar
-        </Link>
-      </div>
+      <InternalPage>
+        <EmptyState
+          title="Shopping não encontrado"
+          description="A unidade informada não existe ou não está disponível no portfólio atual."
+          icon={Building2}
+          action={
+            <Link
+              to="/shoppings"
+              className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs font-medium hover:bg-muted/50"
+            >
+              Voltar aos shoppings
+            </Link>
+          }
+        />
+      </InternalPage>
     );
 
   return (
-    <div className="space-y-4">
+    <InternalPage>
       <Link
         to="/shoppings"
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
@@ -72,24 +82,57 @@ function ShoppingDetailPage() {
         <ArrowLeft className="h-3.5 w-3.5" /> Voltar aos shoppings
       </Link>
 
-      <div className="panel flex flex-wrap items-center justify-between gap-4 p-4">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-lg border border-border/50 bg-gradient-to-br from-[var(--accent-blue)]/25 to-transparent">
-            <Building2 className="h-6 w-6 text-[var(--accent-blue)]" />
+      <div className="panel overflow-hidden p-4 md:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-lg border border-border/50 bg-gradient-to-br from-[var(--accent-blue)]/25 to-transparent">
+              <Building2 className="h-6 w-6 text-[var(--accent-blue)]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold md:text-2xl">{d.name}</h1>
+                <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-semibold">
+                  {d.code}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {d.city} / {d.state} · Atualizado {formatRelative(d.lastUpdate)}
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold md:text-2xl">{d.name}</h1>
-              <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-semibold">
-                {d.code}
-              </span>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {d.city} / {d.state} · Atualizado {formatRelative(d.lastUpdate)}
-            </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge status={d.status} />
+            <StatusPill
+              label={`${d.dataAvailability.coveragePct}% cobertura`}
+              tone={d.dataAvailability.coveragePct >= 90 ? "positive" : "warning"}
+            />
           </div>
         </div>
-        <StatusBadge status={d.status} />
+        <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border/70 to-transparent" />
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-muted-foreground">
+          <span>
+            Qualidade:{" "}
+            <strong className="font-medium text-foreground capitalize">{d.dataQuality}</strong>
+          </span>
+          <span>
+            Chillers:{" "}
+            <strong className="font-medium text-foreground">
+              {d.dataAvailability.chillers ? "disponível" : "indisponível"}
+            </strong>
+          </span>
+          <span>
+            Periféricos:{" "}
+            <strong className="font-medium text-foreground">
+              {d.dataAvailability.perifericos ? "disponível" : "indisponível"}
+            </strong>
+          </span>
+          <span>
+            Temperaturas:{" "}
+            <strong className="font-medium text-foreground">
+              {d.dataAvailability.temperaturas ? "disponível" : "indisponível"}
+            </strong>
+          </span>
+        </div>
       </div>
 
       {/* Métricas principais */}
@@ -268,7 +311,7 @@ function ShoppingDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </InternalPage>
   );
 }
 
@@ -322,13 +365,7 @@ function EnergyChart({ data }: { data: { time: string; consumo: number; eficienc
             stroke="oklch(0.6 0.02 250)"
             tick={{ fontSize: 11 }}
           />
-          <Tooltip
-            contentStyle={{
-              background: "oklch(0.20 0.03 260)",
-              border: "1px solid oklch(0.35 0.03 260)",
-              borderRadius: 8,
-            }}
-          />
+          <Tooltip contentStyle={chartTooltipStyle} />
           <Legend wrapperStyle={{ fontSize: 11 }} />
           <Area
             yAxisId="r"
@@ -392,13 +429,7 @@ function PowerBars({
                 width={90}
                 tick={{ fontSize: 11 }}
               />
-              <Tooltip
-                contentStyle={{
-                  background: "oklch(0.20 0.03 260)",
-                  border: "1px solid oklch(0.35 0.03 260)",
-                  borderRadius: 8,
-                }}
-              />
+              <Tooltip contentStyle={chartTooltipStyle} />
               <Bar dataKey="kw" fill={color} radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>

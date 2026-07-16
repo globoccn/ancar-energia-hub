@@ -1,10 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Droplet, Leaf, Recycle, Shield, Sprout, Target, Users, Zap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { dashboardService } from "@/services/dashboardService";
 import type { ESGMetrics, RankingItem } from "@/types";
-import { PageHeader } from "@/components/ui-helpers";
-import { Droplet, Leaf, Recycle, Shield, Users, Zap } from "lucide-react";
+import { LoadingCards, PageHeader } from "@/components/ui-helpers";
+import {
+  chartTooltipStyle,
+  InternalPage,
+  SectionPanel,
+  StatCard,
+  StatusPill,
+} from "@/components/InternalPage";
 import { formatNumber } from "@/utils/format";
 
 export const Route = createFileRoute("/esg")({
@@ -15,81 +22,137 @@ export const Route = createFileRoute("/esg")({
 function ESGPage() {
   const [esg, setEsg] = useState<ESGMetrics | null>(null);
   const [ranking, setRanking] = useState<RankingItem[]>([]);
+
   useEffect(() => {
-    dashboardService.getESGMetrics().then(setEsg);
-    dashboardService.getRanking("esg").then(setRanking);
+    let alive = true;
+    Promise.all([dashboardService.getESGMetrics(), dashboardService.getRanking("esg")]).then(
+      ([metrics, rankingItems]) => {
+        if (!alive) return;
+        setEsg(metrics);
+        setRanking(rankingItems);
+      },
+    );
+    return () => {
+      alive = false;
+    };
   }, []);
-  if (!esg) return null;
+
+  const bestShopping = ranking[0];
+  const averageScore = useMemo(
+    () =>
+      ranking.length ? ranking.reduce((total, item) => total + item.value, 0) / ranking.length : 0,
+    [ranking],
+  );
+
+  if (!esg) {
+    return (
+      <InternalPage>
+        <PageHeader
+          eyebrow="Sustentabilidade corporativa"
+          title="Indicadores ESG"
+          subtitle="Ambiental, Social e Governança do portfólio."
+          icon={Leaf}
+        />
+        <LoadingCards count={6} />
+      </InternalPage>
+    );
+  }
 
   return (
-    <div className="space-y-4">
+    <InternalPage>
       <PageHeader
+        eyebrow="Sustentabilidade corporativa"
         title="Indicadores ESG"
-        subtitle="Ambiental · Social · Governança — dados demonstrativos"
+        subtitle="Consolidação dos indicadores ambientais, sociais e de governança do portfólio."
+        icon={Leaf}
+        right={<StatusPill label="Dados demonstrativos" tone="info" />}
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <Card
-          icon={<Zap className="h-4 w-4 text-[var(--accent-cyan)]" />}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-6">
+        <StatCard
           label="Energia consumida"
-          value={`${formatNumber(esg.energiaConsumidaMWh)} MWh`}
+          value={formatNumber(esg.energiaConsumidaMWh)}
+          unit="MWh"
+          icon={Zap}
+          accent="cyan"
         />
-        <Card
-          icon={<Zap className="h-4 w-4 text-[var(--accent-green)]" />}
+        <StatCard
           label="Energia economizada"
-          value={`${formatNumber(esg.energiaEconomizadaMWh)} MWh`}
+          value={formatNumber(esg.energiaEconomizadaMWh)}
+          unit="MWh"
+          icon={Sprout}
+          accent="green"
         />
-        <Card
-          icon={<Leaf className="h-4 w-4 text-[var(--accent-yellow)]" />}
+        <StatCard
           label="Emissões"
-          value={`${formatNumber(esg.emissoesT)} t CO₂`}
+          value={formatNumber(esg.emissoesT)}
+          unit="t CO₂"
+          icon={Leaf}
+          accent="yellow"
         />
-        <Card
-          icon={<Leaf className="h-4 w-4 text-[var(--accent-green)]" />}
+        <StatCard
           label="Emissões evitadas"
-          value={`${formatNumber(esg.emissoesEvitadasT)} t CO₂`}
+          value={formatNumber(esg.emissoesEvitadasT)}
+          unit="t CO₂"
+          icon={Leaf}
+          accent="green"
         />
-        <Card
-          icon={<Zap className="h-4 w-4 text-[var(--accent-purple)]" />}
+        <StatCard
           label="Intensidade energética"
-          value={`${esg.intensidadeEnergetica} kWh/m²`}
+          value={esg.intensidadeEnergetica}
+          unit="kWh/m²"
+          icon={Zap}
+          accent="purple"
         />
-        <Card
-          icon={<Shield className="h-4 w-4 text-[var(--accent-blue)]" />}
+        <StatCard
           label="Progresso da meta"
-          value={`${esg.metaProgressoPct}%`}
+          value={esg.metaProgressoPct}
+          unit="%"
+          icon={Target}
+          accent="blue"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="panel p-4 xl:col-span-2">
-          <h3 className="mb-3 text-sm font-semibold">Ranking ESG por shopping</h3>
-          <div className="h-80">
-            <ResponsiveContainer>
-              <BarChart data={ranking.map((r) => ({ code: r.code, esg: r.value }))}>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+        <SectionPanel
+          title="Ranking ESG por shopping"
+          subtitle="Pontuação consolidada por unidade"
+          icon={Leaf}
+          contentClassName="pt-3"
+        >
+          <div className="h-[340px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={ranking.map((item) => ({ code: item.code, esg: item.value }))}
+                margin={{ top: 12, right: 10, left: -10, bottom: 0 }}
+              >
                 <CartesianGrid
                   stroke="oklch(0.35 0.03 260 / 25%)"
                   strokeDasharray="3 3"
                   vertical={false}
                 />
-                <XAxis dataKey="code" stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 10 }} />
-                <YAxis stroke="oklch(0.6 0.02 250)" tick={{ fontSize: 11 }} domain={[60, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    background: "oklch(0.20 0.03 260)",
-                    border: "1px solid oklch(0.35 0.03 260)",
-                    borderRadius: 8,
-                  }}
+                <XAxis
+                  dataKey="code"
+                  stroke="oklch(0.6 0.02 250)"
+                  tick={{ fontSize: 9 }}
+                  tickLine={false}
                 />
+                <YAxis
+                  stroke="oklch(0.6 0.02 250)"
+                  tick={{ fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={false}
+                  domain={[60, 100]}
+                />
+                <Tooltip contentStyle={chartTooltipStyle} />
                 <Bar dataKey="esg" radius={[4, 4, 0, 0]} fill="var(--accent-green)" />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </SectionPanel>
 
-        <div className="panel p-4">
-          <h3 className="mb-3 text-sm font-semibold">ESG Score consolidado</h3>
-          <div className="relative mx-auto grid h-44 w-44 place-items-center">
+        <SectionPanel title="ESG Score consolidado" subtitle="Composição dos pilares" icon={Shield}>
+          <div className="relative mx-auto grid h-48 w-48 place-items-center">
             <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
               <circle
                 cx="50"
@@ -115,80 +178,62 @@ function ESGPage() {
               <div className="text-xs text-muted-foreground">de 100</div>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-            <div>
-              <div className="metric-value">{esg.ambiental}</div>
-              <div className="text-muted-foreground">Ambiental</div>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+            <ScorePillar label="Ambiental" value={esg.ambiental} color="var(--accent-green)" />
+            <ScorePillar label="Social" value={esg.social} color="var(--accent-purple)" />
+            <ScorePillar label="Governança" value={esg.governanca} color="var(--accent-blue)" />
+          </div>
+          <div className="mt-4 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">Melhor unidade</span>
+              <span className="font-medium">{bestShopping?.code ?? "—"}</span>
             </div>
-            <div>
-              <div className="metric-value">{esg.social}</div>
-              <div className="text-muted-foreground">Social</div>
-            </div>
-            <div>
-              <div className="metric-value">{esg.governanca}</div>
-              <div className="text-muted-foreground">Governança</div>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">Média do portfólio</span>
+              <span className="metric-value">
+                {formatNumber(averageScore, { maximumFractionDigits: 1 })}
+              </span>
             </div>
           </div>
-        </div>
+        </SectionPanel>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
-        <Card
-          icon={<Zap className="h-4 w-4 text-[var(--accent-green)]" />}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <StatCard
           label="Energia renovável"
-          value={`${esg.energiaRenovavelPct}%`}
-          demo
+          value={esg.energiaRenovavelPct}
+          unit="%"
+          icon={Zap}
+          accent="green"
         />
-        <Card
-          icon={<Droplet className="h-4 w-4 text-[var(--accent-cyan)]" />}
-          label="Água"
-          value={`${formatNumber(esg.aguaM3)} m³`}
-          demo
+        <StatCard
+          label="Consumo de água"
+          value={formatNumber(esg.aguaM3)}
+          unit="m³"
+          icon={Droplet}
+          accent="cyan"
         />
-        <Card
-          icon={<Recycle className="h-4 w-4 text-[var(--accent-yellow)]" />}
-          label="Resíduos"
-          value={`${esg.residuosT} t`}
-          demo
-        />
-        <Card
-          icon={<Users className="h-4 w-4 text-[var(--accent-purple)]" />}
-          label="Social"
-          value={`${esg.social} pts`}
-          demo
-        />
-        <Card
-          icon={<Shield className="h-4 w-4 text-[var(--accent-blue)]" />}
+        <StatCard label="Resíduos" value={esg.residuosT} unit="t" icon={Recycle} accent="yellow" />
+        <StatCard label="Pilar social" value={esg.social} unit="pts" icon={Users} accent="purple" />
+        <StatCard
           label="Governança"
-          value={`${esg.governanca} pts`}
-          demo
+          value={esg.governanca}
+          unit="pts"
+          icon={Shield}
+          accent="blue"
         />
       </div>
-    </div>
+    </InternalPage>
   );
 }
 
-function Card({
-  icon,
-  label,
-  value,
-  demo,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  demo?: boolean;
-}) {
+function ScorePillar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="panel p-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</span>
+    <div className="rounded-xl border border-border/45 bg-muted/15 p-2.5">
+      <div className="metric-value text-lg" style={{ color }}>
+        {value}
       </div>
-      <div className="metric-value mt-2 text-xl">{value}</div>
-      {demo && (
-        <div className="mt-1 text-[10px] text-muted-foreground/80">dados demonstrativos</div>
-      )}
+      <div className="mt-0.5 text-[10px] text-muted-foreground">{label}</div>
     </div>
   );
 }

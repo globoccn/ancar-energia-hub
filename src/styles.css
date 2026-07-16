@@ -199,3 +199,188 @@
     height: 292px;
   }
 }
+
+/* Etapa 6 — padronização das páginas internas */
+.internal-page {
+  width: 100%;
+  max-width: 1760px;
+  margin-inline: auto;
+  animation: internal-page-enter 260ms ease-out both;
+}
+
+@keyframes internal-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.125rem 0 0.25rem;
+}
+
+.page-heading__icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--accent-cyan) 28%, transparent);
+  border-radius: 0.9rem;
+  color: var(--accent-cyan);
+  background:
+    linear-gradient(145deg, color-mix(in oklab, var(--accent-cyan) 13%, transparent), transparent),
+    color-mix(in oklab, var(--card) 92%, transparent);
+  box-shadow: 0 12px 30px -22px color-mix(in oklab, var(--accent-cyan) 70%, transparent);
+}
+
+.internal-page .panel {
+  background:
+    linear-gradient(145deg, oklch(1 0 0 / 2.4%), transparent 42%),
+    color-mix(in oklab, var(--card) 94%, transparent);
+  border-color: color-mix(in oklab, var(--border) 86%, transparent);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.internal-page .panel:hover {
+  border-color: color-mix(in oklab, var(--accent-cyan) 14%, var(--border));
+}
+
+.section-panel__header {
+  display: flex;
+  min-height: 3.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 72%, transparent);
+  padding: 0.8rem 1rem;
+  background: color-mix(in oklab, var(--muted) 18%, transparent);
+}
+
+.section-panel__icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.65rem;
+  color: var(--accent-cyan);
+  background: color-mix(in oklab, var(--accent-cyan) 9%, transparent);
+}
+
+.summary-card {
+  min-height: 7.2rem;
+  padding: 1rem;
+}
+
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.page-toolbar select,
+.page-toolbar input {
+  box-shadow: none;
+}
+
+.data-table-shell {
+  overflow: hidden;
+}
+
+.data-table-shell table {
+  min-width: 760px;
+}
+
+.data-table-shell thead {
+  background: color-mix(in oklab, var(--muted) 35%, transparent);
+}
+
+.data-table-shell tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.data-table-shell tbody tr:hover {
+  background: color-mix(in oklab, var(--accent-cyan) 4%, transparent);
+}
+
+.empty-state {
+  display: flex;
+  min-height: 17rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.empty-state__icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--accent-cyan);
+  background: color-mix(in oklab, var(--accent-cyan) 10%, transparent);
+  box-shadow: 0 0 28px -14px color-mix(in oklab, var(--accent-cyan) 80%, transparent);
+}
+
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius: 0.7rem;
+  padding: 0.2rem;
+  background: color-mix(in oklab, var(--card) 78%, transparent);
+}
+
+.segmented-control > button {
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.72rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  transition: all 160ms ease;
+}
+
+.segmented-control > button:hover {
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+}
+
+.segmented-control > button[data-active="true"] {
+  color: var(--accent-cyan);
+  background: color-mix(in oklab, var(--accent-cyan) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent-cyan) 24%, transparent);
+}
+
+@media (max-width: 767px) {
+  .page-heading {
+    align-items: stretch;
+  }
+
+  .page-heading > :last-child:not(:first-child) {
+    width: 100%;
+  }
+
+  .page-heading > :last-child:not(:first-child) > * {
+    flex: 1;
+  }
+
+  .summary-card {
+    min-height: 6.5rem;
+  }
+}

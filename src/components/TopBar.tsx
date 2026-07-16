@@ -1,5 +1,6 @@
 import { Calendar, ChevronDown, GitCompareArrows, Search } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { shoppings } from "@/data/mock/shoppings";
+import { dashboardService } from "@/services/dashboardService";
+import type { Shopping } from "@/types";
 import { useDashboardRuntime } from "@/contexts/dashboard-runtime-context";
 import { formatRelative } from "@/utils/format";
 
@@ -21,6 +23,17 @@ const controlClass =
 
 export function TopBar() {
   const { lastUpdate } = useDashboardRuntime();
+  const [shoppings, setShoppings] = useState<Shopping[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+    dashboardService.getShoppings().then((items) => {
+      if (alive) setShoppings(items);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/55 bg-[color-mix(in_oklab,var(--background)_92%,transparent)] backdrop-blur-xl">
