@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   Bolt,
+  ChevronLeft,
   ChevronRight,
   DollarSign,
   Droplet,
@@ -78,6 +79,7 @@ function OverviewPage() {
   const { tick } = useDashboardRuntime();
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>("24h");
   const [rankingMetric, setRankingMetric] = useState<RankingMetric>("eficiencia");
+  const [portfolioPage, setPortfolioPage] = useState(0);
   const [data, setData] = useState<{
     kpi: PortfolioKpi;
     series: EnergyDataPoint[];
@@ -115,6 +117,13 @@ function OverviewPage() {
   const rankingValues = ranking.map((item) => item.value);
   const rankingMin = Math.min(...rankingValues);
   const rankingMax = Math.max(...rankingValues);
+  const portfolioPageSize = 6;
+  const portfolioPageCount = Math.ceil(data.shoppings.length / portfolioPageSize);
+  const safePortfolioPage = Math.min(portfolioPage, portfolioPageCount - 1);
+  const portfolioItems = data.shoppings.slice(
+    safePortfolioPage * portfolioPageSize,
+    safePortfolioPage * portfolioPageSize + portfolioPageSize,
+  );
 
   return (
     <div className="overview-dashboard space-y-4">
@@ -336,13 +345,55 @@ function OverviewPage() {
               Ver todos
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {data.shoppings.slice(0, 6).map((shopping) => (
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {portfolioItems.map((shopping) => (
               <ShoppingCard key={shopping.id} shopping={shopping} />
             ))}
           </div>
-          <div className="mt-3 text-xs text-muted-foreground">
-            Exibindo 6 de {data.shoppings.length} shoppings
+          <div className="mt-3 flex items-center justify-between gap-3 text-[10px] text-muted-foreground">
+            <span>
+              Exibindo {safePortfolioPage * portfolioPageSize + 1}–
+              {Math.min((safePortfolioPage + 1) * portfolioPageSize, data.shoppings.length)} de{" "}
+              {data.shoppings.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="Página anterior"
+                disabled={safePortfolioPage === 0}
+                onClick={() => setPortfolioPage((page) => Math.max(0, page - 1))}
+                className="grid h-7 w-7 place-items-center rounded-md border border-border/55 bg-muted/15 transition-colors hover:border-primary/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: portfolioPageCount }, (_, page) => (
+                <button
+                  type="button"
+                  key={page}
+                  aria-label={`Ir para a página ${page + 1}`}
+                  aria-current={page === safePortfolioPage ? "page" : undefined}
+                  onClick={() => setPortfolioPage(page)}
+                  className={`grid h-7 min-w-7 place-items-center rounded-md border px-2 text-[10px] font-medium transition-colors ${
+                    page === safePortfolioPage
+                      ? "border-primary/55 bg-primary/12 text-primary"
+                      : "border-border/55 bg-muted/15 hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  {page + 1}
+                </button>
+              ))}
+              <button
+                type="button"
+                aria-label="Próxima página"
+                disabled={safePortfolioPage === portfolioPageCount - 1}
+                onClick={() =>
+                  setPortfolioPage((page) => Math.min(portfolioPageCount - 1, page + 1))
+                }
+                className="grid h-7 w-7 place-items-center rounded-md border border-border/55 bg-muted/15 transition-colors hover:border-primary/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </section>
 

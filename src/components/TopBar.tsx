@@ -1,4 +1,5 @@
 import { Calendar, ChevronDown, GitCompareArrows, Search } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,18 @@ export function TopBar() {
     <header className="sticky top-0 z-30 border-b border-border/55 bg-[color-mix(in_oklab,var(--background)_92%,transparent)] backdrop-blur-xl">
       <div className="flex h-16 min-w-0 items-center gap-3 px-3 sm:px-4 lg:px-5">
         <SidebarTrigger className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground md:hidden" />
+
+        <Link
+          to="/"
+          aria-label="Página inicial"
+          className="hidden h-10 w-[112px] shrink-0 items-center border-r border-border/45 pr-4 lg:flex"
+        >
+          <img
+            src="/images/logo-ancar-white.png"
+            alt=""
+            className="h-[30px] w-auto object-contain opacity-95 transition-opacity hover:opacity-100"
+          />
+        </Link>
 
         <div className="relative min-w-[180px] flex-1 md:max-w-[620px]">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
