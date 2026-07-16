@@ -8,7 +8,7 @@ import { Droplet, Leaf, Recycle, Shield, Users, Zap } from "lucide-react";
 import { formatNumber } from "@/utils/format";
 
 export const Route = createFileRoute("/esg")({
-  head: () => ({ meta: [{ title: "Indicadores ESG — Ancar" }] }),
+  head: () => ({ meta: [{ title: "Indicadores ESG" }] }),
   component: ESGPage,
 });
 

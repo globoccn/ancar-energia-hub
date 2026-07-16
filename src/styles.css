@@ -175,3 +175,27 @@
       var(--sidebar);
   }
 }
+
+/* Dashboard principal otimizado para telas widescreen, incluindo 1920x1200. */
+@media (min-width: 1600px) {
+  .overview-dashboard {
+    max-width: 100%;
+  }
+
+  .overview-dashboard > * {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1800px) and (min-height: 1100px) {
+  .overview-dashboard {
+    display: flex;
+    min-height: calc(100svh - 6.5rem);
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .overview-chart {
+    height: 292px;
+  }
+}

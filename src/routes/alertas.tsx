@@ -7,7 +7,7 @@ import { alertStatusLabel, formatDateTime, severityLabel } from "@/utils/format"
 import { AlertOctagon, AlertTriangle, Info } from "lucide-react";
 
 export const Route = createFileRoute("/alertas")({
-  head: () => ({ meta: [{ title: "Central de Alertas — Ancar" }] }),
+  head: () => ({ meta: [{ title: "Central de Alertas" }] }),
   component: AlertasPage,
 });
 

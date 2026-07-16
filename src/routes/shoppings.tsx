@@ -21,8 +21,8 @@ import { formatNumber, formatRelative } from "@/utils/format";
 export const Route = createFileRoute("/shoppings")({
   head: () => ({
     meta: [
-      { title: "Shoppings — Ancar" },
-      { name: "description", content: "Portfólio de shoppings monitorados pela Ancar." },
+      { title: "Shoppings" },
+      { name: "description", content: "Portfólio de shoppings monitorados." },
     ],
   }),
   component: ShoppingsPage,

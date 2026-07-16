@@ -11,13 +11,13 @@ import { USE_MOCK_DATA } from "@/config";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — Ancar" }] }),
+  head: () => ({ meta: [{ title: "Configurações" }] }),
   component: ConfiguracoesPage,
 });
 
 function ConfiguracoesPage() {
   const [useMock, setUseMock] = useState(USE_MOCK_DATA);
-  const [apiUrl, setApiUrl] = useState("https://n8n.exemplo.com/webhook/ancar");
+  const [integrationUrl, setIntegrationUrl] = useState("https://dados.exemplo.com/portfolio");
   const [emissionFactor, setEmissionFactor] = useState("0.084");
   const [refresh, setRefresh] = useState("30");
 
@@ -114,10 +114,10 @@ function ConfiguracoesPage() {
               </thead>
               <tbody>
                 {[
-                  ["Alex Gomes", "alex@ancar.com.br", "Administrador"],
-                  ["Marina Souza", "marina@ancar.com.br", "Analista"],
-                  ["Rafael Lima", "rafael@ancar.com.br", "Operador"],
-                  ["Camila Torres", "camila@ancar.com.br", "Visualização"],
+                  ["Alex Gomes", "alex@empresa.com.br", "Administrador"],
+                  ["Marina Souza", "marina@empresa.com.br", "Analista"],
+                  ["Rafael Lima", "rafael@empresa.com.br", "Operador"],
+                  ["Camila Torres", "camila@empresa.com.br", "Visualização"],
                 ].map(([n, e, p]) => (
                   <tr key={e} className="border-t border-border/30">
                     <td className="p-3">{n}</td>
@@ -191,12 +191,16 @@ function ConfiguracoesPage() {
               <div>
                 <div className="text-sm font-medium">Usar dados mockados</div>
                 <div className="text-xs text-muted-foreground">
-                  Quando desativado, a aplicação consulta a REST API do n8n.
+                  Quando desativado, a aplicação consulta a fonte de dados configurada.
                 </div>
               </div>
               <Switch checked={useMock} onCheckedChange={setUseMock} />
             </div>
-            <Field label="Endpoint REST API (n8n)" value={apiUrl} onChange={setApiUrl} />
+            <Field
+              label="Endpoint de integração"
+              value={integrationUrl}
+              onChange={setIntegrationUrl}
+            />
             <Field
               label="Intervalo de atualização (segundos)"
               value={refresh}

@@ -12,21 +12,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { shoppings } from "@/data/mock/shoppings";
+import { useDashboardRuntime } from "@/contexts/dashboard-runtime-context";
+import { formatRelative } from "@/utils/format";
 
 const controlClass =
   "h-9 shrink-0 gap-2 rounded-lg border-border/55 bg-[color-mix(in_oklab,var(--card)_76%,transparent)] px-3 text-[12px] font-medium text-foreground/90 shadow-none hover:bg-accent/55 hover:text-foreground";
 
 export function TopBar() {
+  const { lastUpdate } = useDashboardRuntime();
+
   return (
     <header className="sticky top-0 z-30 border-b border-border/55 bg-[color-mix(in_oklab,var(--background)_92%,transparent)] backdrop-blur-xl">
       <div className="flex h-16 min-w-0 items-center gap-3 px-3 sm:px-4 lg:px-5">
         <SidebarTrigger className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground md:hidden" />
 
-        <div className="hidden w-[145px] shrink-0 items-center md:flex">
-          <img src="/images/logo-ancar.png" alt="Ancar" className="h-11 w-auto object-contain" />
-        </div>
-
-        <div className="relative min-w-[180px] flex-1 md:max-w-[500px]">
+        <div className="relative min-w-[180px] flex-1 md:max-w-[620px]">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             aria-label="Buscar shopping ou métrica"
@@ -89,6 +89,11 @@ export function TopBar() {
             Comparar
             <ChevronDown className="h-3.5 w-3.5 opacity-60" />
           </Button>
+
+          <div className="flex items-center gap-2 whitespace-nowrap px-1 text-[11px] text-muted-foreground">
+            <span className="inline-flex h-2 w-2 rounded-full bg-[var(--accent-cyan)]" />
+            Atualizado {formatRelative(lastUpdate.toISOString())}
+          </div>
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-3 lg:gap-4">

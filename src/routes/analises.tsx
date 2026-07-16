@@ -20,7 +20,7 @@ import type { Shopping } from "@/types";
 import { PageHeader } from "@/components/ui-helpers";
 
 export const Route = createFileRoute("/analises")({
-  head: () => ({ meta: [{ title: "Análises — Ancar" }] }),
+  head: () => ({ meta: [{ title: "Análises" }] }),
   component: AnalisesPage,
 });
 

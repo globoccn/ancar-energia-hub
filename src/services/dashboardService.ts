@@ -36,7 +36,7 @@ export const dashboardService = {
     esg: ESGMetrics;
     lastUpdate: string;
   }> {
-    if (!USE_MOCK_DATA) throw new Error("API não configurada");
+    if (!USE_MOCK_DATA) throw new Error("Integração não configurada");
     return wait({
       kpi: computePortfolioKpi(),
       series: makePortfolioSeries(),

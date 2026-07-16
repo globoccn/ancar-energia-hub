@@ -51,11 +51,9 @@ export function AppSidebar() {
         <div className="hidden h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[color-mix(in_oklab,var(--accent-cyan)_88%,white)] to-[var(--accent-blue)] shadow-[0_8px_28px_-14px_oklch(0.82_0.16_195/85%)] md:flex">
           <Activity className="h-5 w-5 text-[var(--sidebar)]" strokeWidth={2.4} />
         </div>
-        <img
-          src="/images/logo-ancar.png"
-          alt="Ancar"
-          className="h-9 w-auto object-contain md:hidden"
-        />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[color-mix(in_oklab,var(--accent-cyan)_88%,white)] to-[var(--accent-blue)] shadow-[0_8px_28px_-14px_oklch(0.82_0.16_195/85%)] md:hidden">
+          <Activity className="h-5 w-5 text-[var(--sidebar)]" strokeWidth={2.4} />
+        </div>
       </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden">

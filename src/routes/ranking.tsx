@@ -8,7 +8,7 @@ import { formatNumber } from "@/utils/format";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/ranking")({
-  head: () => ({ meta: [{ title: "Ranking — Ancar" }] }),
+  head: () => ({ meta: [{ title: "Ranking" }] }),
   component: RankingPage,
 });
 
