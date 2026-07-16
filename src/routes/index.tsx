@@ -1,18 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  Bolt,
-  ChevronLeft,
-  ChevronRight,
-  DollarSign,
-  Droplet,
-  Gauge,
-  Leaf,
-  Settings2,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { Bolt, ChevronLeft, ChevronRight, DollarSign, Droplet, Gauge, Leaf } from "lucide-react";
 import {
   Area,
   CartesianGrid,
@@ -40,6 +28,8 @@ import { LoadingBlock } from "@/components/ui-helpers";
 import { formatNumber } from "@/utils/format";
 import { useDashboardRuntime } from "@/contexts/dashboard-runtime-context";
 import { StatusDot } from "@/components/StatusBadge";
+import { InsightCard } from "@/components/InsightCard";
+import { ESGScoreCard } from "@/components/ESGScoreCard";
 
 type ChartPeriod = "24h" | "7d" | "30d";
 type RankingMetric = "eficiencia" | "consumo" | "esg" | "economia";
@@ -402,89 +392,29 @@ function OverviewPage() {
           <BrazilMap items={data.shoppings} />
         </section>
 
-        <section className="panel p-4 xl:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold">Oportunidades / Insights</h2>
-          <div className="space-y-2">
+        <section className="panel flex h-full min-h-[330px] flex-col p-4 xl:col-span-2">
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold">Oportunidades / Insights</h2>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">Prioridades do portfólio</p>
+            </div>
+            <Link
+              to="/analises"
+              className="text-[10px] font-medium text-[var(--accent-cyan)] hover:underline"
+            >
+              Ver análises
+            </Link>
+          </div>
+          <div className="grid flex-1 auto-rows-fr gap-2">
             {data.insights.map((insight) => (
-              <div
-                key={insight.id}
-                className="group flex cursor-pointer items-start gap-2 rounded-md border border-border/40 bg-muted/20 p-2.5 hover:border-[var(--accent-cyan)]/50"
-              >
-                <div className="mt-0.5">
-                  {insight.icon === "warning" && (
-                    <AlertTriangle className="h-4 w-4 text-[var(--accent-yellow)]" />
-                  )}
-                  {insight.icon === "settings" && (
-                    <Settings2 className="h-4 w-4 text-[var(--accent-cyan)]" />
-                  )}
-                  {insight.icon === "trend" && (
-                    <TrendingUp className="h-4 w-4 text-[var(--accent-green)]" />
-                  )}
-                  {insight.icon === "trending-down" && (
-                    <TrendingDown className="h-4 w-4 text-[var(--accent-purple)]" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium leading-tight">{insight.title}</div>
-                  <div className="text-[11px] text-muted-foreground">{insight.subtitle}</div>
-                  {insight.detail && (
-                    <div className="mt-0.5 text-[11px] text-[var(--accent-cyan)]">
-                      {insight.detail}
-                    </div>
-                  )}
-                </div>
-                <ChevronRight className="h-3.5 w-3.5 self-center text-muted-foreground group-hover:text-foreground" />
-              </div>
+              <InsightCard key={insight.id} insight={insight} />
             ))}
           </div>
         </section>
 
-        <section className="panel p-4 xl:col-span-2">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold">ESG Score Médio</h2>
-          </div>
-          <div className="relative mx-auto grid h-40 w-40 place-items-center">
-            <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="oklch(0.28 0.03 260)"
-                strokeWidth="8"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="var(--accent-green)"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${(data.esg.esgScore / 100) * 264} 264`}
-              />
-            </svg>
-            <div className="text-center">
-              <div className="metric-value text-3xl">{data.esg.esgScore}</div>
-              <div className="text-[10px] text-muted-foreground">de 100</div>
-            </div>
-          </div>
-          <div className="mt-3 space-y-1.5 text-xs">
-            <ScoreLine label="Ambiental" value={data.esg.ambiental} color="var(--accent-green)" />
-            <ScoreLine label="Social" value={data.esg.social} color="var(--accent-cyan)" />
-            <ScoreLine
-              label="Governança"
-              value={data.esg.governanca}
-              color="var(--accent-purple)"
-            />
-          </div>
-          <Link
-            to="/esg"
-            className="mt-3 block rounded-md border border-border/50 bg-muted/20 px-3 py-1.5 text-center text-xs hover:border-[var(--accent-cyan)]/50"
-          >
-            Ver detalhamento
-          </Link>
-        </section>
+        <div className="xl:col-span-2">
+          <ESGScoreCard metrics={data.esg} />
+        </div>
       </div>
     </div>
   );
@@ -566,15 +496,4 @@ function formatRankingValue(value: number, metric: RankingMetric) {
   if (metric === "esg") return formatNumber(value, { maximumFractionDigits: 0 });
   if (metric === "economia") return `R$ ${formatNumber(value, { maximumFractionDigits: 1 })}`;
   return formatNumber(value, { maximumFractionDigits: 2 });
-}
-
-function ScoreLine({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="flex items-center gap-1.5 text-muted-foreground">
-        <span className="h-2 w-2 rounded-full" style={{ background: color }} /> {label}
-      </span>
-      <span className="metric-value">{value}</span>
-    </div>
-  );
 }
